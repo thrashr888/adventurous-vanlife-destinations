@@ -13,24 +13,19 @@ class App extends Component {
       docUrl:
         'https://docs.google.com/spreadsheets/d/e/2PACX-1vR5mJfTqI8H2RG-YCyy6_OWFzaZe5nHQouniy0cvlyBW1n6-FqXEMuwScJzp-zho1Yh58ZgOHF8Q_Cj/pub?gid=632068352&single=true&output=tsv',
       destinations: [],
-      zoom: 15,
+      hZoom: 15,
+      vZoom: 15,
       horizontal: 0,
       vertical: 0,
     };
 
-    this.handleZoom = this.handleZoom.bind(this);
-    this.handleVertical = this.handleVertical.bind(this);
-    this.handleHorizontal = this.handleHorizontal.bind(this);
+    this.handleRange = this.handleRange.bind(this);
   }
 
   componentDidMount() {
     getTSV(this.state.docUrl).then(destinations => {
       this.setState({ destinations });
     });
-  }
-
-  fudgeNumber(num, zoom = 50, move = 1000, dir) {
-    return Math.abs(num) * zoom - move - dir;
   }
 
   handleRange(key = 'range') {
@@ -40,14 +35,9 @@ class App extends Component {
       this.setState(state);
     };
   }
-  handleZoom(e) {
-    this.setState({ zoom: e.target.value });
-  }
-  handleHorizontal(e) {
-    this.setState({ horizontal: e.target.value });
-  }
-  handleVertical(e) {
-    this.setState({ vertical: e.target.value });
+
+  fudgeNumber(num, zoom = 50, move = 1000, dir) {
+    return Math.abs(num) * zoom - move - dir;
   }
 
   render() {
@@ -61,17 +51,26 @@ class App extends Component {
           <div className="Tools">
             <input
               type="range"
-              onChange={this.handleRange('zoom')}
-              defaultValue={this.state.zoom}
+              onChange={this.handleRange('hZoom')}
+              defaultValue={this.state.hZoom}
               min="5"
               max="25"
             />
-            {this.state.zoom} zoom
+            {this.state.hZoom} horizontal zoom
+            <br />
+            <input
+              type="range"
+              onChange={this.handleRange('vZoom')}
+              defaultValue={this.state.vZoom}
+              min="5"
+              max="25"
+            />
+            {this.state.vZoom} vertical zoom
             <br />
             <input type="range" onChange={this.handleRange('vertical')} defaultValue="10" max={height} />
             {this.state.vertical} vertical
             <br />
-            <input type="range" onChange={this.handleHorizontal} defaultValue="10" max={width} />
+            <input type="range" onChange={this.handleRange('horizontal')} defaultValue="10" max={width} />
             {this.state.horizontal} horizontal
           </div>
         </header>
@@ -86,8 +85,8 @@ class App extends Component {
               className="Destination"
               key={d.city + d.state}
               style={{
-                bottom: this.fudgeNumber(d.Lat, this.state.zoom, height, this.state.vertical) + 'px',
-                right: this.fudgeNumber(d.Lng, this.state.zoom, width, this.state.horizontal) + 'px',
+                bottom: this.fudgeNumber(d.Lat, this.state.vZoom, height, this.state.vertical) + 'px',
+                right: this.fudgeNumber(d.Lng, this.state.hZoom, width, this.state.horizontal) + 'px',
               }}
             >
               {d.city}, {d.state}
