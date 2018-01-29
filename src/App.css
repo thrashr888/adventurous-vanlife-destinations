@@ -1,1 +1,14 @@
+.Destinations {
+  height: 70vh;
+  left: -959px;
+  pointer-events: none;
+  position: absolute;
+  top: 80px;
+  width: 100vw;
+}
 
+.Destination {
+  border-bottom: 0.5px solid black;
+  font-size: 10px;
+  position: absolute;
+}

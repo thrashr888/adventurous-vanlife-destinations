@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import usMap from './Blank_US_Map_(states_only).svg';
 import './App.css';
 
 import getTSV from './getTSV';
@@ -12,7 +13,7 @@ class App extends Component {
       docUrl:
         'https://docs.google.com/spreadsheets/d/e/2PACX-1vR5mJfTqI8H2RG-YCyy6_OWFzaZe5nHQouniy0cvlyBW1n6-FqXEMuwScJzp-zho1Yh58ZgOHF8Q_Cj/pub?gid=632068352&single=true&output=tsv',
       destinations: [],
-      zoom: 20,
+      zoom: 15,
       horizontal: 0,
       vertical: 0,
     };
@@ -32,6 +33,13 @@ class App extends Component {
     return Math.abs(num) * zoom - move - dir;
   }
 
+  handleRange(key = 'range') {
+    return e => {
+      let state = {};
+      state[key] = e.target.value;
+      this.setState(state);
+    };
+  }
   handleZoom(e) {
     this.setState({ zoom: e.target.value });
   }
@@ -50,30 +58,41 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <h1 className="App-title">Adventurous Vanlife Destinations</h1>
+          <div className="Tools">
+            <input
+              type="range"
+              onChange={this.handleRange('zoom')}
+              defaultValue={this.state.zoom}
+              min="5"
+              max="25"
+            />
+            {this.state.zoom} zoom
+            <br />
+            <input type="range" onChange={this.handleRange('vertical')} defaultValue="10" max={height} />
+            {this.state.vertical} vertical
+            <br />
+            <input type="range" onChange={this.handleHorizontal} defaultValue="10" max={width} />
+            {this.state.horizontal} horizontal
+          </div>
         </header>
-        <div>
-          <input type="range" onChange={this.handleZoom} defaultValue="10" /> {this.state.zoom} zoom
-          <br />
-          <input type="range" onChange={this.handleVertical} defaultValue="10" max={height} />{' '}
-          {this.state.vertical} vertical
-          <br />
-          <input type="range" onChange={this.handleHorizontal} defaultValue="10" max={width} />{' '}
-          {this.state.horizontal} horizontal
+
+        <div className="Map">
+          <img src={usMap} className="App-logo" alt="logo" />
         </div>
 
-        <div style={{ height: '80vh', position: 'absolute', width: '100vw' }}>
-          {this.state.destinations.map(d => {
-            let style = {
-              bottom: this.fudgeNumber(d.Lat, this.state.zoom, height, this.state.vertical) + 'px',
-              right: this.fudgeNumber(d.Lng, this.state.zoom, width, this.state.horizontal) + 'px',
-              position: 'absolute',
-            };
-            return (
-              <div key={d.city + d.state} style={style}>
-                {d.city}, {d.state}
-              </div>
-            );
-          })}
+        <div className="Destinations">
+          {this.state.destinations.map(d => (
+            <div
+              className="Destination"
+              key={d.city + d.state}
+              style={{
+                bottom: this.fudgeNumber(d.Lat, this.state.zoom, height, this.state.vertical) + 'px',
+                right: this.fudgeNumber(d.Lng, this.state.zoom, width, this.state.horizontal) + 'px',
+              }}
+            >
+              {d.city}, {d.state}
+            </div>
+          ))}
         </div>
       </div>
     );
